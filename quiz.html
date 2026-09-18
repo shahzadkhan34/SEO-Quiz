@@ -1,0 +1,542 @@
+<title>SEO Speed Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F6F5FB;
+    --surface: #FFFFFF;
+    --surface-2: #ECEAF6;
+    --ink: #1B1533;
+    --ink-dim: #5B5573;
+    --navy: #1E2761;
+    --navy-dark: #141B4D;
+    --coral: #F96167;
+    --teal: #17708F;
+    --gold: #B98900;
+    --gold-bg: #F9E795;
+    --green: #2E8540;
+    --green-bg: #6FBE7A;
+    --ring-track: #E1DEF0;
+    --border: #DEDBEE;
+    --shadow: 0 10px 30px -12px rgba(30,39,97,0.25);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg: #100C22;
+      --surface: #1A1533;
+      --surface-2: #221C42;
+      --ink: #F1EFFB;
+      --ink-dim: #ADA6C9;
+      --navy: #CADCFC;
+      --navy-dark: #E7EEFF;
+      --coral: #FF8286;
+      --teal: #5FD0EE;
+      --gold: #F9E795;
+      --gold-bg: #4A3E12;
+      --green: #8CE59D;
+      --green-bg: #1E4426;
+      --ring-track: #322C54;
+      --border: #322C54;
+      --shadow: 0 10px 30px -12px rgba(0,0,0,0.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg: #100C22;
+    --surface: #1A1533;
+    --surface-2: #221C42;
+    --ink: #F1EFFB;
+    --ink-dim: #ADA6C9;
+    --navy: #CADCFC;
+    --navy-dark: #E7EEFF;
+    --coral: #FF8286;
+    --teal: #5FD0EE;
+    --gold: #F9E795;
+    --gold-bg: #4A3E12;
+    --green: #8CE59D;
+    --green-bg: #1E4426;
+    --ring-track: #322C54;
+    --border: #322C54;
+    --shadow: 0 10px 30px -12px rgba(0,0,0,0.6);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    padding-inline:16px;
+    padding-block:28px;
+    min-height:100%;
+    display:flex;
+    justify-content:center;
+  }
+  .app{
+    width:100%;
+    max-width:640px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+  .eyebrow{
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+  }
+  h1,h2{
+    font-family:'Fraunces',Georgia,serif;
+    font-weight:600;
+    text-wrap:balance;
+    margin:0;
+  }
+  .mono{ font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; }
+
+  /* ---------- Screens ---------- */
+  .screen{ display:none; flex-direction:column; gap:20px; }
+  .screen.active{ display:flex; }
+
+  /* Start screen */
+  #screen-start{
+    background:var(--navy);
+    border-radius:20px;
+    padding:38px 28px;
+    color:#fff;
+    box-shadow:var(--shadow);
+    position:relative;
+    overflow:hidden;
+  }
+  :root[data-theme="dark"] #screen-start, @media (prefers-color-scheme:dark){ #screen-start{ color:var(--ink); } }
+  #screen-start::before{
+    content:"";
+    position:absolute;
+    top:-70px; right:-70px;
+    width:200px; height:200px;
+    border-radius:50%;
+    background:var(--navy-dark);
+    opacity:0.5;
+  }
+  #screen-start > *{ position:relative; }
+  #screen-start h1{ font-size:clamp(28px,6vw,36px); color:#fff; margin-top:6px; }
+  :root[data-theme="dark"] #screen-start h1, @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) #screen-start h1{ color:var(--ink); } }
+  #screen-start p.lede{ color:#D9DEF5; font-size:15px; line-height:1.55; max-width:46ch; }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) #screen-start p.lede{ color:var(--ink-dim); } }
+  :root[data-theme="dark"] #screen-start p.lede{ color:var(--ink-dim); }
+  #screen-start .eyebrow{ color:var(--gold); }
+
+  .stat-row{ display:flex; gap:12px; flex-wrap:wrap; }
+  .stat{
+    background:var(--navy-dark);
+    border-radius:12px;
+    padding:14px 18px;
+    flex:1 1 120px;
+    text-align:center;
+  }
+  .stat b{ display:block; font-family:'Fraunces',serif; font-size:26px; color:var(--coral); }
+  .stat span{ font-size:12px; color:#D9DEF5; }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .stat span{ color:var(--ink-dim);} }
+  :root[data-theme="dark"] .stat span{ color:var(--ink-dim); }
+
+  button{
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    font-size:15px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    transition:transform .15s ease, filter .15s ease;
+  }
+  button:active{ transform:scale(0.98); }
+  button:focus-visible{ outline:3px solid var(--gold); outline-offset:2px; }
+
+  #start-btn{
+    align-self:flex-start;
+    background:var(--coral);
+    color:#2A0C0E;
+    padding:14px 26px;
+    font-size:16px;
+  }
+  #start-btn:hover{ filter:brightness(1.06); }
+
+  /* Question screen */
+  .quiz-header{ display:flex; align-items:center; justify-content:space-between; gap:14px; }
+  .progress-wrap{ flex:1; }
+  .progress-label{ font-size:12px; font-weight:700; color:var(--ink-dim); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:6px; }
+  .progress-track{ height:6px; border-radius:999px; background:var(--ring-track); overflow:hidden; }
+  .progress-fill{ height:100%; background:var(--coral); border-radius:999px; transition:width .3s ease; }
+
+  .timer{
+    position:relative;
+    width:58px; height:58px;
+    flex:none;
+  }
+  .timer svg{ transform:rotate(-90deg); width:58px; height:58px; }
+  .timer circle{ fill:none; stroke-width:5; }
+  .timer .track{ stroke:var(--ring-track); }
+  .timer .bar{ stroke:var(--coral); stroke-linecap:round; transition:stroke .2s ease; }
+  .timer .bar.low{ stroke:#E5484D; }
+  .timer .num{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; font-weight:700;
+  }
+  .timer .num.low{ color:#E5484D; }
+
+  .card-question{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:24px;
+    box-shadow:var(--shadow);
+  }
+  #q-text{ font-size:clamp(19px,4.4vw,23px); line-height:1.35; }
+
+  .options{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:18px; }
+  @media (max-width:480px){ .options{ grid-template-columns:1fr; } }
+
+  .opt{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-align:left;
+    padding:14px 16px;
+    border-radius:14px;
+    border:2px solid transparent;
+    color:#fff;
+    font-size:14.5px;
+    line-height:1.3;
+    min-height:64px;
+  }
+  .opt .badge{
+    flex:none;
+    width:30px; height:30px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.92);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces',serif; font-weight:700; font-size:14px;
+  }
+  .opt[data-i="0"]{ background:var(--coral); }
+  .opt[data-i="0"] .badge{ color:var(--coral); }
+  .opt[data-i="1"]{ background:var(--teal); }
+  .opt[data-i="1"] .badge{ color:var(--teal); }
+  .opt[data-i="2"]{ background:var(--gold-bg); color:#3A2E00; }
+  .opt[data-i="2"] .badge{ color:var(--gold); background:#fff; }
+  .opt[data-i="3"]{ background:var(--green-bg); }
+  .opt[data-i="3"] .badge{ color:var(--green); }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]) .opt[data-i="2"]{ color:#100C22; }
+  }
+  :root[data-theme="dark"] .opt[data-i="2"]{ color:#100C22; }
+
+  .opt:hover{ filter:brightness(1.05); }
+  .opt.disabled{ pointer-events:none; }
+  .opt.correct{ outline:3px solid #1E9E4A; box-shadow:0 0 0 3px #1E9E4A inset; }
+  .opt.wrong{ opacity:0.45; }
+  .opt.dim{ opacity:0.55; }
+
+  .feedback{
+    display:none;
+    font-size:13.5px;
+    color:var(--ink-dim);
+    background:var(--surface-2);
+    border-radius:12px;
+    padding:12px 14px;
+    line-height:1.5;
+  }
+  .feedback.show{ display:block; }
+  .feedback b{ color:var(--ink); }
+
+  /* Results */
+  #screen-results{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:32px 26px;
+    box-shadow:var(--shadow);
+    text-align:center;
+    gap:8px;
+  }
+  #score-big{ font-family:'Fraunces',serif; font-size:64px; font-weight:700; color:var(--coral); }
+  #score-sub{ color:var(--ink-dim); font-size:14px; margin-bottom:6px; }
+  .review-list{ text-align:left; display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+  .review-row{
+    display:flex; align-items:flex-start; gap:10px;
+    font-size:13.5px; padding:10px 12px; border-radius:10px; background:var(--surface-2);
+  }
+  .review-row .dot{ flex:none; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:#fff; margin-top:1px; }
+  .review-row.ok .dot{ background:#1E9E4A; }
+  .review-row.no .dot{ background:#E5484D; }
+  .review-row .txt{ color:var(--ink-dim); }
+  .review-row .txt b{ color:var(--ink); font-weight:600; }
+
+  #restart-btn{
+    background:var(--navy);
+    color:#fff;
+    padding:12px 22px;
+    align-self:center;
+    margin-top:6px;
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{ transition:none !important; }
+  }
+</style>
+
+<div class="app">
+
+  <section id="screen-start" class="screen active">
+    <div class="eyebrow">BBA4 · Digital Marketing Course</div>
+    <h1>SEO Speed Check</h1>
+    <p class="lede">20 questions on search marketing, SEO mechanics, on-page &amp; off-page optimization, and SEA/retargeting. Answer fast — each question locks after 25 seconds.</p>
+    <div class="stat-row">
+      <div class="stat"><b>20</b><span>Questions</span></div>
+      <div class="stat"><b>4</b><span>Options each</span></div>
+      <div class="stat"><b>25s</b><span>Per question</span></div>
+    </div>
+    <button id="start-btn" type="button">Start Quiz</button>
+  </section>
+
+  <section id="screen-question" class="screen">
+    <div class="quiz-header">
+      <div class="progress-wrap">
+        <div class="progress-label" id="q-count">Question 1 of 20</div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:5%"></div></div>
+      </div>
+      <div class="timer">
+        <svg viewBox="0 0 58 58">
+          <circle class="track" cx="29" cy="29" r="25"></circle>
+          <circle class="bar" id="timer-bar" cx="29" cy="29" r="25" stroke-dasharray="157" stroke-dashoffset="0"></circle>
+        </svg>
+        <div class="num mono" id="timer-num">25</div>
+      </div>
+    </div>
+
+    <div class="card-question">
+      <div id="q-text"></div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+  </section>
+
+  <section id="screen-results" class="screen">
+    <div class="eyebrow">Quiz Complete</div>
+    <div id="score-big">0/20</div>
+    <div id="score-sub">Nice work.</div>
+    <div class="review-list" id="review-list"></div>
+    <button id="restart-btn" type="button">Retake Quiz</button>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var QUESTIONS = [
+    {q:"What does SEO stand for?", options:["Search Engine Optimization","Search Engine Operation","Site Engine Optimization","Search Engagement Optimization"], correct:0, explanation:"SEO = Search Engine Optimization: earning visibility in organic (unpaid) search results."},
+    {q:"In a search results page, which type of result is always labeled \"Sponsored\"?", options:["The organic (SEO) result","The paid (SEA) result","The featured snippet","The Map Pack result"], correct:1, explanation:"SEA (Search Engine Advertising) results are bought via keyword bidding and always carry the \"Sponsored\" tag."},
+    {q:"What is the correct order of how a search engine turns a query into results?", options:["Indexing → Crawling → Ranking","Crawling → Indexing → Ranking","Ranking → Crawling → Indexing","Crawling → Ranking → Indexing"], correct:1, explanation:"Bots first crawl pages, the engine then indexes their content, and finally ranks pages for each query."},
+    {q:"Which of these is a common CRAWLING issue?", options:["Thin or duplicate content","Weak backlink profile","robots.txt blocking bot access","Low click-through rate"], correct:2, explanation:"robots.txt directives, server errors, or orphan pages can all prevent Googlebot from crawling a page."},
+    {q:"In the SEO Iceberg analogy, what is \"above the surface\" (what visitors see)?", options:["Backlinks and social signals","Site speed and crawlability","Search rankings, titles, and content people read","Schema markup"], correct:2, explanation:"Visible elements are only the tip; most of what determines ranking (on-page, off-page, technical) is hidden beneath the surface."},
+    {q:"In the SEO Tree analogy, what do the \"roots\" represent?", options:["On-Page SEO","Off-Page SEO","Technical SEO","Results (fruit)"], correct:2, explanation:"Roots = Technical SEO (speed, crawlability, mobile-friendliness, schema) — the unseen foundation the whole tree depends on."},
+    {q:"Which of the following is an ON-PAGE SEO factor?", options:["Backlinks from other websites","Guest posts on other blogs","Title tag","Social shares"], correct:2, explanation:"Title tag, URL, keywords, content, headings and images are all on-page factors you control directly on your own site."},
+    {q:"What is the recommended character length for a title tag?", options:["10-20 characters","50-60 characters","100-120 characters","150-200 characters"], correct:1, explanation:"Around 50-60 characters keeps the title tag from being truncated in search results (Google cuts it off near 70 characters)."},
+    {q:"What SEO practice should you avoid when placing keywords in your content?", options:["Placing them in the title","Using them in headings","Keyword stuffing","Researching them first"], correct:2, explanation:"Keyword stuffing (unnaturally repeating keywords) is a spammy tactic that search engines penalize rather than reward."},
+    {q:"What is a backlink?", options:["A link from your website to another website","A link from another website pointing to yours","An internal link between two pages on your own site","A broken (dead) link"], correct:1, explanation:"A backlink is an inbound link from another site — like a vote of confidence in your content's value."},
+    {q:"In the Maple Street Bakery ranking comparison, what mainly explains why it outranks its competitor organically?", options:["Higher ad spend alone","A strong combination of keyword match, content quality, backlinks, technical health, UX and reviews","Older domain age alone","More social media followers alone"], correct:1, explanation:"Ranking is driven by many combined signals together, not any single factor in isolation."},
+    {q:"A page ranks #5 but has a low click-through rate (CTR). What does the SEMrush example suggest is the likely cause?", options:["A weak backlink profile","Uncrawlable pages","The title tag and meta description aren't enticing enough","A duplicate-content penalty"], correct:2, explanation:"Low CTR at a decent position usually points to an unappealing title tag/meta description, not a ranking problem."},
+    {q:"What best describes pixel-based retargeting?", options:["It uses an uploaded email list to target known contacts","It uses a cookie placed in a visitor's browser to serve ads after they leave the site","It only works through social media platforms","It requires no technical implementation"], correct:1, explanation:"A JavaScript pixel cookies anonymous visitors so ads can follow them across the web after they leave your site."},
+    {q:"What is a downside of list-based retargeting?", options:["It works only on anonymous visitors","It's too immediate/fast","It depends on maintaining an accurate contact list, making it less automatic and timely","It cannot be customized at all"], correct:2, explanation:"Because you must upload and maintain the list yourself, list-based retargeting is less automatic than pixel-based retargeting."},
+    {q:"Which SEO tool is best known for keyword search-volume and competition data?", options:["Yoast SEO","Google Keyword Planner","Google Trends","Google My Business"], correct:1, explanation:"Google Keyword Planner (in Google Ads) provides search volume and competition data to size keyword opportunities."},
+    {q:"Which type of SEO focuses on \"near me\" searches and Google Business Profile optimization?", options:["On-Page SEO","Off-Page SEO","Technical SEO","Local SEO"], correct:3, explanation:"Local SEO targets local/'near me' searches through Google Business Profile, NAP consistency, and local reviews."},
+    {q:"What is the key cost difference between SEO and SEA?", options:["SEO is paid, SEA is free","SEO is earned/organic (unpaid); SEA is bought by bidding on keywords","Both are always completely free","Both require the exact same fixed budget"], correct:1, explanation:"SEO rankings are earned through relevance and authority; SEA visibility is purchased through keyword bidding (CPC)."},
+    {q:"What happens to SEA (paid ad) visibility once the budget runs out?", options:["It continues indefinitely for free","It stops immediately","It automatically converts into organic ranking","It increases in visibility"], correct:1, explanation:"Paid visibility is only rented — the moment the budget stops, the ad disappears from results."},
+    {q:"Which of these is NOT one of the six on-page SEO levers (URL, Keywords, Written Content, Headings, Title Tag, Images)?", options:["Backlinks","URL structure","Title tag","Image alt text"], correct:0, explanation:"Backlinks are an OFF-page SEO factor (earned from other sites), not one of the on-page levers you control directly."},
+    {q:"What is the risk of suddenly getting hundreds of backlinks from unknown, low-quality domains?", options:["It always boosts rankings quickly and safely","It can look like manipulation and trigger a trust penalty","It has absolutely no effect on rankings","It automatically improves technical SEO"], correct:1, explanation:"Quality and relevance of backlinks matter more than raw quantity — a sudden spike of low-quality links reads as manipulation to search engines."}
+  ];
+
+  var TIME_LIMIT = 25;
+  var CIRC = 2 * Math.PI * 25; // r=25
+
+  var state = {
+    idx: 0,
+    score: 0,
+    answers: [], // {chosen, correct, timedOut}
+    timerId: null,
+    remaining: TIME_LIMIT,
+    locked: false
+  };
+
+  var el = {
+    start: document.getElementById("screen-start"),
+    question: document.getElementById("screen-question"),
+    results: document.getElementById("screen-results"),
+    startBtn: document.getElementById("start-btn"),
+    restartBtn: document.getElementById("restart-btn"),
+    qCount: document.getElementById("q-count"),
+    progressFill: document.getElementById("progress-fill"),
+    timerBar: document.getElementById("timer-bar"),
+    timerNum: document.getElementById("timer-num"),
+    qText: document.getElementById("q-text"),
+    options: document.getElementById("options"),
+    feedback: document.getElementById("feedback"),
+    scoreBig: document.getElementById("score-big"),
+    scoreSub: document.getElementById("score-sub"),
+    reviewList: document.getElementById("review-list")
+  };
+
+  function showScreen(name){
+    [el.start, el.question, el.results].forEach(function(s){ s.classList.remove("active"); });
+    name.classList.add("active");
+  }
+
+  function startQuiz(){
+    state.idx = 0;
+    state.score = 0;
+    state.answers = [];
+    showScreen(el.question);
+    renderQuestion();
+  }
+
+  function renderQuestion(){
+    state.locked = false;
+    var item = QUESTIONS[state.idx];
+    el.qCount.textContent = "Question " + (state.idx + 1) + " of " + QUESTIONS.length;
+    el.progressFill.style.width = ((state.idx) / QUESTIONS.length * 100) + "%";
+    el.qText.textContent = item.q;
+    el.feedback.classList.remove("show");
+    el.feedback.innerHTML = "";
+
+    el.options.innerHTML = "";
+    item.options.forEach(function(optText, i){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "opt";
+      b.setAttribute("data-i", i);
+      b.innerHTML = '<span class="badge">' + String.fromCharCode(65 + i) + '</span><span>' + escapeHtml(optText) + '</span>';
+      b.addEventListener("click", function(){ handleAnswer(i); });
+      el.options.appendChild(b);
+    });
+
+    startTimer();
+  }
+
+  function escapeHtml(s){
+    var d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function startTimer(){
+    state.remaining = TIME_LIMIT;
+    updateTimerUI();
+    clearInterval(state.timerId);
+    state.timerId = setInterval(function(){
+      state.remaining -= 1;
+      updateTimerUI();
+      if (state.remaining <= 0){
+        clearInterval(state.timerId);
+        if (!state.locked) handleAnswer(null);
+      }
+    }, 1000);
+  }
+
+  function updateTimerUI(){
+    var frac = Math.max(state.remaining, 0) / TIME_LIMIT;
+    var offset = CIRC * (1 - frac);
+    el.timerBar.style.strokeDasharray = CIRC;
+    el.timerBar.style.strokeDashoffset = offset;
+    el.timerNum.textContent = Math.max(state.remaining, 0);
+    var low = state.remaining <= 5;
+    el.timerBar.classList.toggle("low", low);
+    el.timerNum.classList.toggle("low", low);
+  }
+
+  function handleAnswer(chosenIndex){
+    if (state.locked) return;
+    state.locked = true;
+    clearInterval(state.timerId);
+
+    var item = QUESTIONS[state.idx];
+    var isCorrect = chosenIndex === item.correct;
+    if (isCorrect) state.score += 1;
+    state.answers.push({ chosen: chosenIndex, correct: item.correct, ok: isCorrect });
+
+    var buttons = el.options.querySelectorAll(".opt");
+    buttons.forEach(function(btn){
+      var i = parseInt(btn.getAttribute("data-i"), 10);
+      btn.classList.add("disabled");
+      if (i === item.correct){
+        btn.classList.add("correct");
+      } else if (i === chosenIndex){
+        btn.classList.add("wrong");
+      } else {
+        btn.classList.add("dim");
+      }
+    });
+
+    el.feedback.classList.add("show");
+    if (chosenIndex === null){
+      el.feedback.innerHTML = "<b>Time's up.</b> " + escapeHtml(item.explanation);
+    } else if (isCorrect){
+      el.feedback.innerHTML = "<b>Correct.</b> " + escapeHtml(item.explanation);
+    } else {
+      el.feedback.innerHTML = "<b>Not quite.</b> " + escapeHtml(item.explanation);
+    }
+
+    setTimeout(nextQuestion, 1600);
+  }
+
+  function nextQuestion(){
+    state.idx += 1;
+    if (state.idx >= QUESTIONS.length){
+      showResults();
+    } else {
+      renderQuestion();
+    }
+  }
+
+  function showResults(){
+    el.progressFill.style.width = "100%";
+    showScreen(el.results);
+    el.scoreBig.textContent = state.score + "/" + QUESTIONS.length;
+    var pct = Math.round((state.score / QUESTIONS.length) * 100);
+    var msg;
+    if (pct >= 85) msg = "Excellent — you know your SEO fundamentals.";
+    else if (pct >= 65) msg = "Solid grasp — a few concepts to revisit.";
+    else if (pct >= 40) msg = "Good start — review the on-page & technical SEO sections.";
+    else msg = "Worth a full review of the SEO/SEM lecture before the exam.";
+    el.scoreSub.textContent = pct + "% — " + msg;
+
+    el.reviewList.innerHTML = "";
+    state.answers.forEach(function(a, i){
+      var item = QUESTIONS[i];
+      var row = document.createElement("div");
+      row.className = "review-row " + (a.ok ? "ok" : "no");
+      var chosenText = a.chosen === null ? "No answer (time out)" : item.options[a.chosen];
+      row.innerHTML = '<span class="dot">' + (a.ok ? "✓" : "✕") + '</span>' +
+        '<span class="txt"><b>Q' + (i+1) + '.</b> ' + escapeHtml(item.q) + '<br>Your answer: ' + escapeHtml(chosenText) +
+        (a.ok ? '' : ('<br>Correct: ' + escapeHtml(item.options[item.correct]))) + '</span>';
+      el.reviewList.appendChild(row);
+    });
+  }
+
+  el.startBtn.addEventListener("click", startQuiz);
+  el.restartBtn.addEventListener("click", startQuiz);
+
+  // ---- hot reload support ----
+  function boot(data){
+    // Stateless per-viewer quiz: always start fresh at the welcome screen.
+    showScreen(el.start);
+  }
+  try{
+    if (window.claude && window.claude.hot){
+      window.claude.hot.ready ? window.claude.hot.ready(boot) : boot(window.claude.hot.data || {});
+    } else {
+      boot({});
+    }
+  } catch(e){ boot({}); }
+
+})();
+</script>
